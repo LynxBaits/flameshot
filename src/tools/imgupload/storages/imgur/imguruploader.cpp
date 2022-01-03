@@ -35,9 +35,9 @@ void ImgurUploader::handleReply(QNetworkReply* reply)
         QJsonDocument response = QJsonDocument::fromJson(reply->readAll());
         QJsonObject json = response.object();
         QJsonObject data = json[QStringLiteral("data")].toObject();
-        setImageURL(data[QStringLiteral("link")].toString());
+        setImageURL(data[QStringLiteral("fileLink")].toString());
 
-        auto deleteToken = data[QStringLiteral("deletehash")].toString();
+        auto deleteToken = data[QStringLiteral("deleteLink")].toString();
 
         // save history
         m_currentImageName = imageURL().toString();
@@ -66,18 +66,15 @@ void ImgurUploader::upload()
     pixmap().save(&buffer, "PNG");
 
     QUrlQuery urlQuery;
-    urlQuery.addQueryItem(QStringLiteral("title"), QStringLiteral(""));
-    QString description = FileNameHandler().parsedPattern();
-    urlQuery.addQueryItem(QStringLiteral("description"), description);
 
-    QUrl url(QStringLiteral("https://api.imgur.com/3/image"));
+    QUrl url(QStringLiteral("https://api.has-cool.pics/upload"));
     url.setQuery(urlQuery);
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader,
                       "application/application/x-www-form-urlencoded");
     request.setRawHeader(
       "Authorization",
-      QStringLiteral("Client-ID %1").arg(IMGUR_CLIENT_ID).toUtf8());
+      QStringLiteral("Bearer %1").arg("5571aa48-b8f5-4393-b007-7124989b27ba").toUtf8());
 
     m_NetworkAM->post(request, byteArray);
 }
@@ -87,7 +84,7 @@ void ImgurUploader::deleteImage(const QString& fileName,
 {
     Q_UNUSED(fileName)
     bool successful = QDesktopServices::openUrl(
-      QUrl(QStringLiteral("https://imgur.com/delete/%1").arg(deleteToken)));
+      QUrl(QStringLiteral(deleteToken);
     if (!successful) {
         notification()->showMessage(tr("Unable to open the URL."));
     }
